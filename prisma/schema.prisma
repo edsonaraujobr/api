@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  rate        Int?
+  name        String
+  date        DateTime
+  description String?
+
+  student    Student @relation(fields: [student_id], references: [id])
+  student_id String
+
+  @@map("projects")
+}
+
+model Class {
+  id           String    @id @default(uuid())
+  name         String
+  date_started DateTime?
+  date_end     DateTime?
+  Student      Student[]
+
+  administrator    Administrator @relation(fields: [administrator_id], references: [id])
+  administrator_id String
+  Module           Module[]
+
+  @@map("classes")
+}
+
+model Module {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  administrator    Administrator @relation(fields: [administrator_id], references: [id])
+  administrator_id String
+
+  class    Class  @relation(fields: [class_id], references: [id])
+  class_id String
+
+  @@map("modules")
+}
+
+model Administrator {
+  id           String    @id @default(uuid())
+  full_name    String
+  salary       Decimal?
+  email        String    @unique
+  password     String
+  date_birtday DateTime?
+  Student      Student[]
+  Class        Class[]
+  Module       Module[]
+
+  @@map("administrators")
+}
+
+model Student {
+  id           String    @id @default(uuid())
+  full_name    String
+  state        String?
+  city         String?
+  Project      Project[]
+  email        String    @unique
+  password     String
+  date_birtday DateTime?
+
+  administrator    Administrator @relation(fields: [administrator_id], references: [id])
+  administrator_id String
+
+  class    Class  @relation(fields: [class_id], references: [id])
+  class_id String
+
+  @@map("students")
+}
