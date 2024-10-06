@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/administrator/login", loginAdministrator);
 router.post("/administrator/create", createAdministrator);
-router.post("/administrator/update/:id", authorizeAdmistrator, updateAdministrator);
-router.post("/administrator/delete/:id", authorizeAdmistrator, deleteAdministrator);
+router.put("/administrator/update/:id", authorizeAdmistrator, updateAdministrator);
+router.delete("/administrator/delete/:id", authorizeAdmistrator, deleteAdministrator);
 
 export default router;
