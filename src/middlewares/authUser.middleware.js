@@ -25,8 +25,16 @@ export const authorizeAdmistrator = (req, res, next) => {
     }
 }
 
-export const authorizeClerk = (req, res, next) => {
+export const authorizeStudent = (req, res, next) => {
     if (req.user && req.user.role === 'student') {
+        next();
+    } else {
+        res.sendStatus(403); 
+    }
+}
+
+export const authorizeStudentAndAdministrator = (req, res, next) => {
+    if (req.user && req.user.role === 'student' || req.user && req.user.role === 'administrator' ) {
         next();
     } else {
         res.sendStatus(403); 

@@ -13,6 +13,7 @@ model Project {
   name        String
   date        DateTime
   description String?
+  link_github String?
 
   student    Student @relation(fields: [student_id], references: [id])
   student_id String
@@ -51,7 +52,6 @@ model Module {
 model Administrator {
   id           String    @id @default(uuid())
   full_name    String
-  salary       Decimal?
   email        String    @unique
   password     String
   date_birtday DateTime?
@@ -65,12 +65,11 @@ model Administrator {
 model Student {
   id           String    @id @default(uuid())
   full_name    String
-  state        String?
-  city         String?
   Project      Project[]
   email        String    @unique
   password     String
   date_birtday DateTime?
+  isAccepted   Boolean   @default(false)
 
   administrator    Administrator @relation(fields: [administrator_id], references: [id])
   administrator_id String

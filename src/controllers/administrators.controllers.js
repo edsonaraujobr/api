@@ -44,7 +44,7 @@ export const loginAdministrator = async (req, res) => {
 
 export const createAdministrator = async (req, res) => {
   try {
-    const { full_name, salary, email, date_birthday, password } = req.body;
+    const { full_name, email, date_birthday, password } = req.body;
 
     if (!full_name || !email || !password) {
       return res.status(400).send("Faltam parâmetros obrigatórios!");
@@ -63,7 +63,6 @@ export const createAdministrator = async (req, res) => {
     await prisma.administrator.create({
       data: {
         full_name,
-        salary,
         email,
         password: hashedPassword,
         date_birthday,
@@ -79,10 +78,10 @@ export const createAdministrator = async (req, res) => {
 export const updateAdministrator = async (req, res) => {
   try {
     const { id } = req.params;
-    const { full_name, salary, email, date_birthday, password } = req.body;
+    const { full_name, email, date_birthday, password } = req.body;
 
     const administrator = await prisma.administrator.findUnique({
-      where: { id: Number(id) }
+      where: { id }
     });
 
     if (!administrator) {
@@ -91,7 +90,6 @@ export const updateAdministrator = async (req, res) => {
 
     const updatedData = {
       full_name,
-      salary,
       email,
       date_birthday
     };
@@ -101,7 +99,7 @@ export const updateAdministrator = async (req, res) => {
     }
 
     await prisma.administrator.update({
-      where: { id: Number(id) },
+      where: { id },
       data: updatedData,
     });
 
@@ -125,7 +123,7 @@ export const deleteAdministrator = async (req, res) => {
     }
 
     await prisma.administrator.delete({
-      where: { id: Number(id) },
+      where: { id},
     });
 
     res.status(200).send("Administrador excluído com sucesso!");
