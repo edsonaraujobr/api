@@ -54,7 +54,7 @@ model Administrator {
   full_name    String
   email        String    @unique
   password     String
-  date_birtday DateTime?
+  date_birthday DateTime?
   Student      Student[]
   Class        Class[]
   Module       Module[]
@@ -68,7 +68,7 @@ model Student {
   Project      Project[]
   email        String    @unique
   password     String
-  date_birtday DateTime?
+  date_birthday DateTime?
   isAccepted   Boolean   @default(false)
 
   administrator    Administrator @relation(fields: [administrator_id], references: [id])

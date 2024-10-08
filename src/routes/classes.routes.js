@@ -4,9 +4,9 @@ import { authorizeAdmistrator, authorizeStudentAndAdministrator } from "../middl
 
 const router = express.Router();
 
-router.post("/class/readAll", readAllClasses);
-router.post("/class/create", authorizeAdmistrator, createClass);
-router.put("/class/update/:id", authorizeAdmistrator, updateClass);
-router.delete("/class/delete/:id", authorizeAdmistrator, deleteClass);
+router.get("/class/read", readAllClasses);
+router.post("/class/create", createClass);
+router.put("/class/update/:id", updateClass);
+router.delete("/class/delete/:id", deleteClass);
 
 export default router;

@@ -27,7 +27,7 @@ export const createClass = async (req, res) => {
       }
     });
 
-    res.status(201).send("Classe criado com sucesso!");
+    res.status(201).send("Classe criada com sucesso!");
   } catch (error) {
     console.error(error);
     res.status(500).send("Erro ao criar a classe");
@@ -36,7 +36,7 @@ export const createClass = async (req, res) => {
 
 export const updateClass = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // Manter como string
     const { name, date_started, date_end, administrator_id } = req.body;
 
     const existingClass = await prisma.class.findUnique({ where: { id } });
@@ -64,7 +64,7 @@ export const updateClass = async (req, res) => {
 
 export const deleteClass = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; 
 
     const existingClass = await prisma.class.findUnique({ where: { id } });
 
@@ -73,7 +73,7 @@ export const deleteClass = async (req, res) => {
     }
 
     await prisma.class.delete({
-      where: { id }
+      where: { id }  
     });
 
     res.status(200).send("Classe deletada com sucesso!");
