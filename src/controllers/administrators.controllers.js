@@ -65,7 +65,7 @@ export const createAdministrator = async (req, res) => {
         full_name,
         email,
         password: hashedPassword,
-        date_birthday,
+        date_birthday: new Date(date_birthday),
       }
     });
 
