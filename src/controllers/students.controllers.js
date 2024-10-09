@@ -1,11 +1,30 @@
 import { prisma } from "../lib/prisma.js";
 import bcrypt from "bcrypt";
-import * as dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-
 const saltRounds = 10;
-dotenv.config();
-const SECRET = process.env.SECRET;
+
+export const readStudents = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (id) {
+      const student = await prisma.student.findUnique({
+        where: { id: id },
+      });
+
+      if (!student) {
+        return res.status(404).send("Estudante não encontrado");
+      }
+
+      return res.status(200).json(student);
+    }
+
+    const students = await prisma.student.findMany();
+    res.status(200).json(students);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erro ao buscar estudantes");
+  }
+};
 
 export const loginStudent = async (req, res) => {
   try {
@@ -22,16 +41,16 @@ export const loginStudent = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, student.password);
 
     if (!passwordMatch) {
-      return res.status(401).send("Senha incorreta");
+      return res.status(401).send("Estudante não encontrado");
     }
 
-    if (student.isAccepted === false) {
-      return res.status(401).send("Estudante ainda não aceito");
+    if(student.isAccepted === false) {
+      return res.status(401).send("Estudante não aceito, tente mais tarde.");
     }
 
     const token = jwt.sign(
       {
-        name: student.full_name,
+        name: student.name,
         email: student.email,
         role: 'student'
       },
@@ -50,16 +69,16 @@ export const createStudent = async (req, res) => {
   try {
     const { full_name, email, password, date_birthday, administrator_id, class_id } = req.body;
 
-    if (!full_name || !email || !password || !administrator_id || !class_id) {
-      return res.status(400).send("Faltam parâmetros obrigatórios!");
+    if (!full_name || !email || !password || !administrator_id || !class_id ) {
+      res.status(400).send("Faltam parâmetros obrigatórios!");
     }
 
     const alreadyStudent = await prisma.student.findFirst({
-      where: { email }
-    });
+      where: { email}
+    })
 
-    if (alreadyStudent) {
-      return res.status(400).send("Já existe estudante com este email.");
+    if(alreadyStudent) {
+      res.status(400).send("Já existe usuário com este email.")
     }
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -68,8 +87,8 @@ export const createStudent = async (req, res) => {
       data: {
         full_name,
         email,
-        password: hashedPassword,
-        date_birthday: new Date(date_birthday), 
+        password: hashedPassword, 
+        date_birthday: new Date(date_birthday),
         administrator_id,
         class_id
       }
@@ -78,63 +97,38 @@ export const createStudent = async (req, res) => {
     res.status(201).send("Estudante criado com sucesso!");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao criar estudante");
-  }
-};
-
-export const readStudents = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (id) {
-      const student = await prisma.student.findUnique({
-        where: { id: Number(id) },
-      });
-
-      if (!student) {
-        return res.status(404).send("Estudante não encontrado");
-      }
-
-      return res.status(200).json(student);
-    }
-
-    const students = await prisma.student.findMany();
-    res.status(200).json(students);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Erro ao buscar estudantes");
+    res.status(500).send("Erro ao criar estudante.");
   }
 };
 
 export const updateStudent = async (req, res) => {
   try {
-    const { id } = req.params; 
-
+    const { id } = req.params;
     const { full_name, email, date_birthday, password, isAccepted } = req.body;
 
-    const student = await prisma.student.findUnique({
-      where: { id }
+    const administrator = await prisma.administrator.findUnique({
+      where: { id}
     });
 
-    if (!student) {
-      return res.status(404).send("Estudante não encontrado");
+    if (!administrator) {
+      return res.status(404).send("Administrador não encontrado");
     }
 
     const updatedData = {
       full_name,
       email,
-      date_birthday
+      date_birthday: new Date(date_birthday),
     };
 
+    if (req.user.role === 'administrator' && accept !== undefined) {
+      updatedData.accept = accept;
+    }
+    
     if (password) {
       updatedData.password = await bcrypt.hash(password, saltRounds);
     }
 
-    if (typeof isAccepted !== 'undefined' && req.user?.role === 'administrator') {
-      updatedData.isAccepted = isAccepted; 
-    }
-
-    await prisma.student.update({
+    await prisma.administrator.update({
       where: { id },
       data: updatedData,
     });
@@ -146,14 +140,12 @@ export const updateStudent = async (req, res) => {
   }
 };
 
-
-
 export const deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
 
     const student = await prisma.student.findUnique({
-      where: { id: id}
+      where: { id }
     });
 
     if (!student) {
@@ -161,12 +153,12 @@ export const deleteStudent = async (req, res) => {
     }
 
     await prisma.student.delete({
-      where: { id: id },
+      where: { id },
     });
 
     res.status(200).send("Estudante excluído com sucesso!");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao excluir estudante");
+    res.status(500).send("Erro ao excluir Estudante");
   }
 };

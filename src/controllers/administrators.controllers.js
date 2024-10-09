@@ -7,12 +7,36 @@ const saltRounds = 10;
 dotenv.config();
 const SECRET = process.env.SECRET;
 
+export const readAdministrators = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (id) {
+      const administrator = await prisma.administrator.findUnique({
+        where: { id },
+      });
+
+      if (!administrator) {
+        return res.status(404).send("Administrador não encontrado");
+      }
+
+      return res.status(200).json(administrator);
+    }
+
+    const administrators = await prisma.administrator.findMany();
+    res.status(200).json(administrators);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erro ao buscar administradores");
+  }
+};
+
 export const loginAdministrator = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const administrator = await prisma.administrator.findFirst({
-      where: { email }
+      where: { email: email }
     });
 
     if (!administrator) {
@@ -22,12 +46,12 @@ export const loginAdministrator = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, administrator.password);
 
     if (!passwordMatch) {
-      return res.status(401).send("Senha incorreta");
+      return res.status(401).send("Administrador não encontrado");
     }
 
     const token = jwt.sign(
       {
-        name: administrator.full_name,
+        name: administrator.name,
         email: administrator.email,
         role: 'administrator'
       },
@@ -53,11 +77,11 @@ export const createAdministrator = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const alreadyAdministrator = await prisma.administrator.findFirst({
-      where: { email }
+      where: { email: email }
     });
 
     if (alreadyAdministrator) {
-      return res.status(400).send("Já existe administrador com este email.");
+      return res.status(400).send("Já existe usuário com este email.");
     }
 
     await prisma.administrator.create({
@@ -71,32 +95,7 @@ export const createAdministrator = async (req, res) => {
 
     res.status(201).send("Administrador criado com sucesso!");
   } catch (error) {
-    console.error(error);
     res.status(500).send("Erro ao criar administrador");
-  }
-};
-
-export const readAdministrators = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (id) {
-      const administrator = await prisma.administrator.findUnique({
-        where: { id: Number(id) },
-      });
-
-      if (!administrator) {
-        return res.status(404).send("Administrador não encontrado");
-      }
-
-      return res.status(200).json(administrator);
-    }
-
-    const administrators = await prisma.administrator.findMany();
-    res.status(200).json(administrators);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Erro ao buscar administradores");
   }
 };
 
@@ -106,7 +105,7 @@ export const updateAdministrator = async (req, res) => {
     const { full_name, email, date_birthday, password } = req.body;
 
     const administrator = await prisma.administrator.findUnique({
-      where: { id: Number(id) }
+      where: { id }
     });
 
     if (!administrator) {
@@ -116,7 +115,7 @@ export const updateAdministrator = async (req, res) => {
     const updatedData = {
       full_name,
       email,
-      date_birthday,
+      date_birthday: new Date(date_birthday),
     };
 
     if (password) {
@@ -124,7 +123,7 @@ export const updateAdministrator = async (req, res) => {
     }
 
     await prisma.administrator.update({
-      where: { id: Number(id) },
+      where: { id },
       data: updatedData,
     });
 
@@ -140,26 +139,20 @@ export const deleteAdministrator = async (req, res) => {
     const { id } = req.params;
 
     const administrator = await prisma.administrator.findUnique({
-      where: { id },
+      where: { id: Number(id) }
     });
 
     if (!administrator) {
       return res.status(404).send("Administrador não encontrado");
     }
 
-    await prisma.class.deleteMany({
-      where: { administrator_id: id },
-    });
-
     await prisma.administrator.delete({
-      where: { id },
+      where: { id},
     });
 
     res.status(200).send("Administrador excluído com sucesso!");
   } catch (error) {
+    console.error(error);
     res.status(500).send("Erro ao excluir administrador");
   }
 };
-
-
-

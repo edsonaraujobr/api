@@ -11,7 +11,6 @@ export const readAllModules = async (req, res) => {
 };
 
 export const createModule = async (req, res) => {
-
   try {
     const { name, description, administrator_id, class_id } = req.body;
 
@@ -30,15 +29,15 @@ export const createModule = async (req, res) => {
 
     res.status(201).send("Módulo criado com sucesso!");
   } catch (error) {
-    res.status(500).send("Erro ao criar o módulo");
+    console.error(error);
+    res.status(500).send("Erro ao criar módulo");
   }
 };
-
 
 export const updateModule = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, administrator_id, class_id } = req.body;
+    const {  name, description, administrator_id, class_id } = req.body;
 
     const existingModule = await prisma.module.findUnique({ where: { id } });
 
@@ -56,32 +55,30 @@ export const updateModule = async (req, res) => {
       }
     });
 
-    res.status(200).send("Módulo atualizado com sucesso!");
+    res.status(200).send("Modulo atualizado com sucesso!");
   } catch (error) {
-    console.error("Erro ao atualizar o módulo:", error);
-    res.status(500).send("Erro ao atualizar o módulo");
+    console.error(error);
+    res.status(500).send("Erro ao atualizar módulo");
   }
 };
-
-
 
 export const deleteModule = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const existingModule = await prisma.module.findUnique({ where: { id: id } });
+    const existingModule = await prisma.module.findUnique({ where: { id } });
 
     if (!existingModule) {
-      return res.status(404).send("Módulo não encontrado");
+      return res.status(404).send("Módulo não encontrada");
     }
 
     await prisma.module.delete({
-      where: { id: id }
+      where: { id }
     });
 
     res.status(200).send("Módulo deletado com sucesso!");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao deletar o módulo");
+    res.status(500).send("Erro ao deletar a módulo");
   }
 };

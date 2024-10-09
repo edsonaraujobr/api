@@ -22,7 +22,7 @@ export const createProject = async (req, res) => {
       data: {
         name,
         description,
-        date: new Date(date),
+        date,
         student_id,
         link_github
       }
@@ -31,42 +31,42 @@ export const createProject = async (req, res) => {
     res.status(201).send("Projeto criado com sucesso!");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao criar o projeto");
+    res.status(500).send("Erro ao criar projeto");
   }
 };
 
 export const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, date, description, link_github, student_id, rate } = req.body;
+    const {  name, date, description, link_github, student_id, rate } = req.body;
 
-    const existingProject = await prisma.project.findUnique({ where: { id: Number(id) } });
+    const existingProject = await prisma.project.findUnique({ where: { id } });
 
     if (!existingProject) {
       return res.status(404).send("Projeto não encontrado");
     }
 
     const updatedData = {
-      name,
-      date: date ? new Date(date) : existingProject.date,
-      description,
-      link_github,
-      student_id
+        name,
+        date,
+        description,
+        link_github,
+        student_id,
     };
 
     if (req.user.role === 'administrator' && rate !== undefined) {
-      updatedData.rate = rate;
+        updatedData.rate = rate;
     }
 
     await prisma.project.update({
-      where: { id: Number(id) },
-      data: updatedData,
+        where: { id },
+        data: updatedData,
     });
 
     res.status(200).send("Projeto atualizado com sucesso!");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao atualizar o projeto");
+    res.status(500).send("Erro ao atualizar Projeto");
   }
 };
 
@@ -74,19 +74,19 @@ export const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const existingProject = await prisma.project.findUnique({ where: { id: id } });
+    const existingProject = await prisma.project.findUnique({ where: { id } });
 
     if (!existingProject) {
       return res.status(404).send("Projeto não encontrado");
     }
 
     await prisma.project.delete({
-      where: { id: id }
+      where: { id }
     });
 
     res.status(200).send("Projeto deletado com sucesso!");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao deletar o projeto");
+    res.status(500).send("Erro ao deletar a projeto");
   }
 };
