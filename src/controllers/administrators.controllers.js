@@ -36,22 +36,22 @@ export const loginAdministrator = async (req, res) => {
     const { email, password } = req.body;
 
     const administrator = await prisma.administrator.findFirst({
-      where: { email: email }
+      where: { email }
     });
 
     if (!administrator) {
-      return res.status(404).send("Administrador não encontrado");
+      return res.status(404).json({ message: "Email não cadastrado" });
     }
 
     const passwordMatch = await bcrypt.compare(password, administrator.password);
 
     if (!passwordMatch) {
-      return res.status(401).send("Administrador não encontrado");
+      return res.status(401).json({ message: "Senha incorreta" });
     }
 
     const token = jwt.sign(
       {
-        name: administrator.name,
+        name: administrator.full_name,
         email: administrator.email,
         role: 'administrator'
       },
@@ -62,9 +62,10 @@ export const loginAdministrator = async (req, res) => {
     res.status(200).json({ message: "Login realizado com sucesso!", token });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao realizar login");
+    res.status(500).json({ message: "Erro ao realizar login" });
   }
 };
+
 
 export const createAdministrator = async (req, res) => {
   try {

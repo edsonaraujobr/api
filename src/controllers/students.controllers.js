@@ -41,16 +41,16 @@ export const loginStudent = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, student.password);
 
     if (!passwordMatch) {
-      return res.status(401).send("Estudante não encontrado");
+      return res.status(401).send("Senha incorreta");
     }
 
-    if(student.isAccepted === false) {
+    if (student.isAccepted === false) {
       return res.status(401).send("Estudante não aceito, tente mais tarde.");
     }
 
     const token = jwt.sign(
       {
-        name: student.name,
+        name: student.full_name,
         email: student.email,
         role: 'student'
       },
@@ -58,7 +58,7 @@ export const loginStudent = async (req, res) => {
       { expiresIn: '4h' }
     );
 
-    res.status(200).json({ message: "Login realizado com sucesso!", token });
+    res.status(200).json({ message: "Login realizado com sucesso!", token, isAccepted: student.isAccepted });
   } catch (error) {
     console.error(error);
     res.status(500).send("Erro ao realizar login");
@@ -106,12 +106,12 @@ export const updateStudent = async (req, res) => {
     const { id } = req.params;
     const { full_name, email, date_birthday, password, isAccepted } = req.body;
 
-    const administrator = await prisma.administrator.findUnique({
-      where: { id}
+    const student = await prisma.student.findUnique({
+      where: { id }
     });
 
-    if (!administrator) {
-      return res.status(404).send("Administrador não encontrado");
+    if (!student) {
+      return res.status(404).send("Estudante não encontrado");
     }
 
     const updatedData = {
@@ -120,15 +120,15 @@ export const updateStudent = async (req, res) => {
       date_birthday: new Date(date_birthday),
     };
 
-    if (req.user.role === 'administrator' && accept !== undefined) {
-      updatedData.accept = accept;
+    if (req.user.role === 'administrator' && isAccepted !== undefined) {
+      updatedData.isAccepted = isAccepted;
     }
-    
+
     if (password) {
       updatedData.password = await bcrypt.hash(password, saltRounds);
     }
 
-    await prisma.administrator.update({
+    await prisma.student.update({
       where: { id },
       data: updatedData,
     });
@@ -139,6 +139,7 @@ export const updateStudent = async (req, res) => {
     res.status(500).send("Erro ao atualizar estudante");
   }
 };
+
 
 export const deleteStudent = async (req, res) => {
   try {
