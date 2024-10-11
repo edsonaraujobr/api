@@ -1,6 +1,12 @@
 import { prisma } from "../lib/prisma.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+
 const saltRounds = 10;
+dotenv.config();
+const SECRET = process.env.SECRET;
 
 export const readStudents = async (req, res) => {
   try {
@@ -117,10 +123,17 @@ export const updateStudent = async (req, res) => {
     const updatedData = {
       full_name,
       email,
-      date_birthday: new Date(date_birthday),
     };
 
-    if (req.user.role === 'administrator' && isAccepted !== undefined) {
+    if (date_birthday) {
+      const parsedDate = new Date(date_birthday);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).send("Data de nascimento inválida");
+      }
+      updatedData.date_birthday = parsedDate;
+    }
+
+    if (isAccepted !== undefined) {
       updatedData.isAccepted = isAccepted;
     }
 
@@ -139,6 +152,8 @@ export const updateStudent = async (req, res) => {
     res.status(500).send("Erro ao atualizar estudante");
   }
 };
+
+
 
 
 export const deleteStudent = async (req, res) => {
