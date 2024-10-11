@@ -82,7 +82,7 @@ export const createAdministrator = async (req, res) => {
     });
 
     if (alreadyAdministrator) {
-      return res.status(400).send("Já existe usuário com este email.");
+      return res.status(409).send("Já existe usuário com este email."); 
     }
 
     await prisma.administrator.create({
@@ -94,8 +94,9 @@ export const createAdministrator = async (req, res) => {
       }
     });
 
-    res.status(201).send("Administrador criado com sucesso!");
+    res.status(201).send("Administrador criado com sucesso!"); 
   } catch (error) {
+    console.error(error); 
     res.status(500).send("Erro ao criar administrador");
   }
 };
