@@ -69,16 +69,16 @@ export const createStudent = async (req, res) => {
   try {
     const { full_name, email, password, date_birthday, administrator_id, class_id } = req.body;
 
-    if (!full_name || !email || !password || !administrator_id || !class_id ) {
-      res.status(400).send("Faltam parâmetros obrigatórios!");
+    if (!full_name || !email || !password || !administrator_id || !class_id) {
+      return res.status(400).json({ message: "Faltam parâmetros obrigatórios!" });
     }
 
     const alreadyStudent = await prisma.student.findFirst({
-      where: { email}
-    })
+      where: { email }
+    });
 
-    if(alreadyStudent) {
-      res.status(400).send("Já existe usuário com este email.")
+    if (alreadyStudent) {
+      return res.status(400).json({ message: "Já existe usuário com este email." });
     }
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -94,10 +94,10 @@ export const createStudent = async (req, res) => {
       }
     });
 
-    res.status(201).send("Estudante criado com sucesso!");
+    res.status(201).json({ message: "Estudante criado com sucesso!" });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao criar estudante.");
+    res.status(500).json({ message: "Erro ao criar estudante." });
   }
 };
 
