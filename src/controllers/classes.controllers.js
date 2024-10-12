@@ -10,6 +10,22 @@ export const readAllClasses = async (req, res) => {
   }
 };
 
+export const readClassById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const classItem = await prisma.class.findUnique({ where: { id } });
+
+    if (!classItem) {
+      return res.status(404).send("Classe não encontrada");
+    }
+
+    res.status(200).json(classItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erro ao buscar a classe");
+  }
+};
+
 export const createClass = async (req, res) => {
   try {
     const { name, date_started, date_end, administrator_id } = req.body;

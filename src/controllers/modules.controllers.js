@@ -10,6 +10,23 @@ export const readAllModules = async (req, res) => {
   }
 };
 
+export const readModuleById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const moduleItem = await prisma.module.findUnique({ where: { id } });
+
+    if (!moduleItem) {
+      return res.status(404).send("Módulo não encontrado");
+    }
+
+    res.status(200).json(moduleItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erro ao buscar o módulo");
+  }
+};
+
+
 export const createModule = async (req, res) => {
   try {
     const { name, description, administrator_id, class_id } = req.body;
