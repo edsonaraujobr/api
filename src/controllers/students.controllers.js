@@ -32,7 +32,9 @@ export const readStudents = async (req, res) => {
   }
 };
 
-export const readStudentsbyID = async (req, res) => {
+
+
+export const readStudentsByID = async (req, res) => {
   try {
     const { id } = req.params;
 

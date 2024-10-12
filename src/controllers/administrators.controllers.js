@@ -31,6 +31,30 @@ export const readAdministrators = async (req, res) => {
   }
 };
 
+export const readAdministratorsByID = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (id) {
+      const administrator = await prisma.administrator.findUnique({
+        where: { id },
+      });
+
+      if (!administrator) {
+        return res.status(404).send("Administrador não encontrado");
+      }
+
+      return res.status(200).json(administrator);
+    }
+
+    const administrators = await prisma.administrator.findMany();
+    res.status(200).json(administrators);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erro ao buscar administradores");
+  }
+};
+
 export const loginAdministrator = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -51,6 +75,7 @@ export const loginAdministrator = async (req, res) => {
 
     const token = jwt.sign(
       {
+        id: administrator.id,
         name: administrator.full_name,
         email: administrator.email,
         role: 'administrator'
@@ -59,8 +84,11 @@ export const loginAdministrator = async (req, res) => {
       { expiresIn: '4h' }
     );
 
-    res.status(200).json({ message: "Login realizado com sucesso!", token });
-  } catch (error) {
+    res.status(200).json({
+      message: "Login realizado com sucesso!",
+      token,
+      id: administrator.id 
+    });  } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erro ao realizar login" });
   }
