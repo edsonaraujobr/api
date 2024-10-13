@@ -5,7 +5,7 @@ import { authorizeAdmistrator } from "../middlewares/authUser.middleware.js";
 const router = express.Router();
 
 router.get("/class/read", readAllClasses);
-router.get("/class/read/:id", readClassById); 
+router.get("/class/readByID/:id", readClassById); 
 router.post("/class/create", authorizeAdmistrator, createClass);
 router.put("/class/update/:id", authorizeAdmistrator, updateClass);
 router.delete("/class/delete/:id", authorizeAdmistrator, deleteClass);

@@ -4,7 +4,7 @@ import { authorizeStudentAndAdministrator, authorizeStudent } from "../middlewar
 
 const router = express.Router();
 
-router.get("/project/readAll", readAllProjects);
+router.get("/project/read", readAllProjects);
 router.post("/project/create", authorizeStudent, createProject);
 router.put("/project/update/:id", authorizeStudentAndAdministrator, updateProject);
 router.delete("/project/delete/:id", authorizeStudentAndAdministrator, deleteProject);

@@ -5,7 +5,7 @@ import { authorizeStudentAndAdministrator, authorizeAdmistrator } from "../middl
 const router = express.Router();
 
 router.get("/student/read", readStudents);
-router.get("/student/readbyID/:id", readStudentsByID);
+router.get("/student/readByID/:id", readStudentsByID);
 router.post("/student/login", loginStudent);
 router.post("/student/create", createStudent);
 router.put("/student/update/:id", authorizeStudentAndAdministrator, updateStudent);
