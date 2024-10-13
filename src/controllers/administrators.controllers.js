@@ -64,13 +64,13 @@ export const loginAdministrator = async (req, res) => {
     });
 
     if (!administrator) {
-      return res.status(404).json({ message: "Email não cadastrado" });
+      return res.status(404).json({ message: "Administrador não encontrado" });
     }
 
     const passwordMatch = await bcrypt.compare(password, administrator.password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ message: "Senha incorreta" });
+      return res.status(401).json({ message: "Administrador não encontrado" });
     }
 
     const token = jwt.sign(
@@ -106,7 +106,7 @@ export const createAdministrator = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const alreadyAdministrator = await prisma.administrator.findFirst({
-      where: { email: email }
+      where: { email }
     });
 
     if (alreadyAdministrator) {
@@ -169,7 +169,7 @@ export const deleteAdministrator = async (req, res) => {
     const { id } = req.params;
 
     const administrator = await prisma.administrator.findUnique({
-      where: { id: Number(id) }
+      where: { id }
     });
 
     if (!administrator) {
