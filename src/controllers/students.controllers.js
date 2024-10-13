@@ -74,7 +74,7 @@ export const loginStudent = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, student.password);
 
     if (!passwordMatch) {
-      return res.status(401).send("Senha incorreta");
+      return res.status(401).send("Estudante não encontrado");
     }
 
     if (student.isAccepted === false) {

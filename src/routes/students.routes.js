@@ -8,7 +8,7 @@ router.get("/student/read", readStudents);
 router.get("/student/readbyID/:id", readStudentsByID);
 router.post("/student/login", loginStudent);
 router.post("/student/create", createStudent);
-router.put("/student/update/:id", updateStudent);
-router.delete("/student/delete/:id", deleteStudent);
+router.put("/student/update/:id", authorizeStudentAndAdministrator, updateStudent);
+router.delete("/student/delete/:id",authorizeAdmistrator, deleteStudent);
 
 export default router;
