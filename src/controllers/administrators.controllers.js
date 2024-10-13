@@ -9,20 +9,6 @@ const SECRET = process.env.SECRET;
 
 export const readAdministrators = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    if (id) {
-      const administrator = await prisma.administrator.findUnique({
-        where: { id },
-      });
-
-      if (!administrator) {
-        return res.status(404).send("Administrador não encontrado");
-      }
-
-      return res.status(200).json(administrator);
-    }
-
     const administrators = await prisma.administrator.findMany();
     res.status(200).json(administrators);
   } catch (error) {
@@ -35,20 +21,16 @@ export const readAdministratorsByID = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (id) {
-      const administrator = await prisma.administrator.findUnique({
-        where: { id },
-      });
+    const administrator = await prisma.administrator.findUnique({
+      where: { id },
+    });
 
-      if (!administrator) {
-        return res.status(404).send("Administrador não encontrado");
-      }
-
-      return res.status(200).json(administrator);
+    if (!administrator) {
+      return res.status(404).send("Administrador não encontrado");
     }
 
-    const administrators = await prisma.administrator.findMany();
-    res.status(200).json(administrators);
+    return res.status(200).json(administrator);
+    
   } catch (error) {
     console.error(error);
     res.status(500).send("Erro ao buscar administradores");
@@ -59,7 +41,7 @@ export const loginAdministrator = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const administrator = await prisma.administrator.findFirst({
+    const administrator = await prisma.administrator.findUnique({
       where: { email }
     });
 
@@ -105,7 +87,7 @@ export const createAdministrator = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const alreadyAdministrator = await prisma.administrator.findFirst({
+    const alreadyAdministrator = await prisma.administrator.findUnique({
       where: { email }
     });
 

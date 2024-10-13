@@ -54,7 +54,7 @@ export const createModule = async (req, res) => {
 export const updateModule = async (req, res) => {
   try {
     const { id } = req.params;
-    const {  name, description, administrator_id, class_id } = req.body;
+    const { name, description, administrator_id, class_id } = req.body;
 
     const existingModule = await prisma.module.findUnique({ where: { id } });
 
