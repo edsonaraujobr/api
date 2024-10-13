@@ -152,11 +152,11 @@ export const updateStudent = async (req, res) => {
     }
 
     if (class_id && req.user.role === 'administrator') {
-      updatedData.classId = class_id;
+      updatedData.class_id = class_id;
     }
 
     if (administrator_id && req.user.role === 'administrator') {
-      updatedData.administratorId = administrator_id;
+      updatedData.administrator_id = administrator_id;
     }
 
     if (password) {
