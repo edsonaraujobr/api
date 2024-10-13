@@ -10,20 +10,6 @@ const SECRET = process.env.SECRET;
 
 export const readStudents = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    if (id) {
-      const student = await prisma.student.findUnique({
-        where: { id: id },
-      });
-
-      if (!student) {
-        return res.status(404).send("Estudante não encontrado");
-      }
-
-      return res.status(200).json(student);
-    }
-
     const students = await prisma.student.findMany();
     res.status(200).json(students);
   } catch (error) {
@@ -32,26 +18,20 @@ export const readStudents = async (req, res) => {
   }
 };
 
-
-
 export const readStudentsByID = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (id) {
-      const student = await prisma.student.findUnique({
-        where: { id: id },
-      });
+    const student = await prisma.student.findUnique({
+      where: { id },
+    });
 
-      if (!student) {
-        return res.status(404).send("Estudante não encontrado");
-      }
-
-      return res.status(200).json(student);
+    if (!student) {
+      return res.status(404).send("Estudante não encontrado");
     }
 
-    const students = await prisma.student.findMany();
-    res.status(200).json(students);
+    return res.status(200).json(student);
+
   } catch (error) {
     console.error(error);
     res.status(500).send("Erro ao buscar estudantes");
@@ -63,7 +43,7 @@ export const loginStudent = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const student = await prisma.student.findFirst({
+    const student = await prisma.student.findUnique({
       where: { email }
     });
 
@@ -113,7 +93,7 @@ export const createStudent = async (req, res) => {
       return res.status(400).json({ message: "Faltam parâmetros obrigatórios!" });
     }
 
-    const alreadyStudent = await prisma.student.findFirst({
+    const alreadyStudent = await prisma.student.findUnique({
       where: { email }
     });
 
@@ -144,7 +124,7 @@ export const createStudent = async (req, res) => {
 export const updateStudent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { full_name, email, date_birthday, password, isAccepted } = req.body;
+    const { full_name, email, date_birthday, password, isAccepted, class_id, administrator_id } = req.body;
 
     const student = await prisma.student.findUnique({
       where: { id }
@@ -167,8 +147,16 @@ export const updateStudent = async (req, res) => {
       updatedData.date_birthday = parsedDate;
     }
 
-    if (isAccepted !== undefined) {
+    if (isAccepted !== undefined && req.user.role === 'administrator') {
       updatedData.isAccepted = isAccepted;
+    }
+
+    if (class_id && req.user.role === 'administrator') {
+      updatedData.classId = class_id;
+    }
+
+    if (administrator_id && req.user.role === 'administrator') {
+      updatedData.administratorId = administrator_id;
     }
 
     if (password) {
@@ -186,9 +174,6 @@ export const updateStudent = async (req, res) => {
     res.status(500).send("Erro ao atualizar estudante");
   }
 };
-
-
-
 
 export const deleteStudent = async (req, res) => {
   try {
