@@ -18,11 +18,21 @@ export const createProject = async (req, res) => {
       return res.status(400).send("Parâmetros obrigatórios faltando!");
     }
 
+    const existingStudent = await prisma.student.findUnique({ where: { id: student_id } });
+    if (!existingStudent) {
+      return res.status(404).send("Estudante não encontrado");
+    }
+
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return res.status(400).send("Data inválida.");
+    }
+
     await prisma.project.create({
       data: {
         name,
         description,
-        date,
+        date: parsedDate,
         student_id,
         link_github
       }
@@ -38,7 +48,7 @@ export const createProject = async (req, res) => {
 export const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const {  name, date, description, link_github, student_id, rate } = req.body;
+    const { name, date, description, link_github, student_id, rate } = req.body;
 
     const existingProject = await prisma.project.findUnique({ where: { id } });
 
@@ -47,26 +57,33 @@ export const updateProject = async (req, res) => {
     }
 
     const updatedData = {
-        name,
-        date,
-        description,
-        link_github,
-        student_id,
+      name,
+      description,
+      link_github,
+      student_id,
     };
 
-    if (req.user.role === 'administrator' && rate !== undefined) {
-        updatedData.rate = rate;
+    if (date) {
+      const parsedDate = new Date(date);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).send("Data inválida.");
+      }
+      updatedData.date = parsedDate;
+    }
+
+    if (rate !== undefined) {
+      updatedData.rate = parseInt(rate, 10); 
     }
 
     await prisma.project.update({
-        where: { id },
-        data: updatedData,
+      where: { id },
+      data: updatedData,
     });
 
     res.status(200).send("Projeto atualizado com sucesso!");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao atualizar Projeto");
+    res.status(500).send("Erro ao atualizar projeto");
   }
 };
 
@@ -87,6 +104,6 @@ export const deleteProject = async (req, res) => {
     res.status(200).send("Projeto deletado com sucesso!");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Erro ao deletar a projeto");
+    res.status(500).send("Erro ao deletar o projeto");
   }
 };
