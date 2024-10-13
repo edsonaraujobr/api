@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get("/module/readAll", readAllModules);
 router.get("/module/read/:id", readModuleById);
-router.post("/module/create", createModule);
-router.put("/module/update/:id", updateModule);
-router.delete("/module/delete/:id", deleteModule);
+router.post("/module/create", authorizeAdmistrator, createModule);
+router.put("/module/update/:id", authorizeAdmistrator, updateModule);
+router.delete("/module/delete/:id", authorizeAdmistrator, deleteModule);
 
 export default router;

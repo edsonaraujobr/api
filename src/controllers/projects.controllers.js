@@ -71,9 +71,9 @@ export const updateProject = async (req, res) => {
       updatedData.date = parsedDate;
     }
 
-    if (rate !== undefined) {
-      updatedData.rate = parseInt(rate, 10); 
-    }
+    if (req.user.role === 'administrator' && rate !== undefined) {
+      updatedData.rate = rate;
+  }
 
     await prisma.project.update({
       where: { id },
