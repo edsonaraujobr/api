@@ -130,7 +130,7 @@ These are the technologies used in this project
 
 ## 📝 License
 
-This project are is under the MIT license. See the [LICENSE](https://github.com/edsonaraujobr/ppda/blob/main/LICENSE) to get more details.
+This project are is under the MIT license. See the [LICENSE](https://github.com/edsonaraujobr/ppda/blob/develop/LICENSE) to get more details.
 
 
 
